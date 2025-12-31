@@ -16,6 +16,33 @@ Un sistema de plugins agnóstico del lenguaje que permite **Hot-Swapping** (carg
 ### ¿Por qué es difícil?
 Gestionar el ciclo de vida (cargar/descargar) de librerías nativas es complejo porque un error de memoria en C/Rust puede tumbar la JVM. Este sistema implementa "Safe Handles" para evitar crashes.
 
+## 📐 Diagrama de Arquitectura
+
+```mermaid
+graph TD
+    Host[Java Host Application]
+    
+    subgraph "Plugin Layer"
+        P1[Java Plugin (.jar)]
+        P2[Python Plugin (.py)]
+        P3[Rust Plugin (.dll)]
+    end
+    
+    Host -->|URLClassLoader| P1
+    Host -->|Python Interpreter| P2
+    Host -->|System.load| P3
+    
+    P1 -->|Implements| I[Plugin Interface]
+    P2 -->|Wraps| I
+    P3 -->|JNI Adapter| I
+```
+
+## 📊 Capacidades del Sistema
+
+*   **Hot-Reload**: Sí (sin reiniciar JVM).
+*   **Lenguajes Soportados**: Java, Python, Rust, C++.
+*   **Seguridad**: Sandboxing parcial (Java Security Manager + Rust Memory Safety).
+
 ## ⚙️ Cómo Ejecutar
 Carga plugins de prueba en los 3 lenguajes:
 
