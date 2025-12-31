@@ -1,0 +1,1 @@
+C:\Users\andre\OneDrive\Documentos\JAVA\ Aprendizajes\Portfolio\ Java\sim-framework\rust-core\target\debug\libsim_core.rlib: C:\Users\andre\OneDrive\Documentos\JAVA\ Aprendizajes\Portfolio\ Java\sim-framework\rust-core\src\lib.rs C:\Users\andre\OneDrive\Documentos\JAVA\ Aprendizajes\Portfolio\ Java\sim-framework\rust-core\src\sim.rs
