@@ -1,0 +1,1 @@
+C:\Users\andre\OneDrive\Documentos\JAVA\ Aprendizajes\Portfolio\ Java\toolchain-gamedev\rust-core\target\debug\asset_core.dll: C:\Users\andre\OneDrive\Documentos\JAVA\ Aprendizajes\Portfolio\ Java\toolchain-gamedev\rust-core\src\core.rs C:\Users\andre\OneDrive\Documentos\JAVA\ Aprendizajes\Portfolio\ Java\toolchain-gamedev\rust-core\src\lib.rs
