@@ -15,7 +15,7 @@ public class JobManager {
 
     public Weights train() {
         try {
-            String script = Path.of("Backend de IA NO-Framework","python-train","train.py").toString();
+            String script = Path.of("python-train","train.py").toString();
             ProcessBuilder pb = new ProcessBuilder("python", script);
             pb.redirectErrorStream(true);
             Process p = pb.start();

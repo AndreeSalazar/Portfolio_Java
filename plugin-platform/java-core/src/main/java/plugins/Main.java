@@ -5,8 +5,8 @@ import java.nio.file.Path;
 public class Main {
     public static void main(String[] args) {
         PluginManager pm = new PluginManager();
-        pm.loadJavaPlugin("plugins.impl.HelloPlugin", Path.of("plugin-platform", "plugins-java", "out"));
-        pm.register(new PythonPlugin("python.hello", Path.of("plugin-platform", "plugins-python", "hello.py")));
+        pm.loadJavaPlugin("plugins.impl.HelloPlugin", Path.of("plugins-java", "out"));
+        pm.register(new PythonPlugin("python.hello", Path.of("plugins-python", "hello.py")));
         pm.register(new NativeRustPlugin("rust.math"));
 
         String echoReq = "{\"op\":\"echo\",\"msg\":\"hola\"}";

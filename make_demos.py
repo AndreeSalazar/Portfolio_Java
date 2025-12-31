@@ -230,6 +230,146 @@ def create_sim_demo():
     save_anim(ani, os.path.join(folder, 'demo.gif'))
     plt.close()
 
+# --- 5. Plugin Platform Demo ---
+def create_plugin_demo():
+    folder = PROJECTS["plugins"]
+    if not os.path.exists(folder): return
+    
+    fig, ax = plt.subplots(figsize=(8, 4), facecolor='#1e1e1e')
+    fig.suptitle('Plugin Platform: Polyglot Execution', color='white')
+    ax.set_facecolor('#1e1e1e')
+    ax.axis('off')
+    
+    # Core System
+    core = plt.Circle((0.5, 0.5), 0.15, color='#ecf0f1', alpha=0.8)
+    ax.add_patch(core)
+    ax.text(0.5, 0.5, "Core\n(Java)", ha='center', va='center', fontsize=10)
+    
+    # Plugins
+    plugins = [
+        {'name': 'Rust', 'color': '#e67e22', 'pos': (0.2, 0.5)},
+        {'name': 'Python', 'color': '#3498db', 'pos': (0.8, 0.5)},
+        {'name': 'Java', 'color': '#e74c3c', 'pos': (0.5, 0.8)},
+    ]
+    
+    patches = []
+    for p in plugins:
+        c = plt.Circle(p['pos'], 0.1, color=p['color'], alpha=0.5)
+        ax.add_patch(c)
+        patches.append(c)
+        ax.text(p['pos'][0], p['pos'][1], p['name'], ha='center', va='center', color='white')
+
+    status = ax.text(0.5, 0.2, "Idle", ha='center', color='yellow')
+
+    def update(frame):
+        idx = (frame // 20) % 3
+        
+        # Reset alphas
+        for p in patches: p.set_alpha(0.3)
+        core.set_color('#ecf0f1')
+        
+        # Activate one
+        patches[idx].set_alpha(1.0)
+        core.set_color(plugins[idx]['color'])
+        
+        status.set_text(f"Executing {plugins[idx]['name']} Plugin...")
+        
+        return patches + [core, status]
+
+    ani = animation.FuncAnimation(fig, update, frames=60, blit=False)
+    save_anim(ani, os.path.join(folder, 'demo.gif'))
+    plt.close()
+
+# --- 6. Runtime Demo ---
+def create_runtime_demo():
+    folder = PROJECTS["runtime"]
+    if not os.path.exists(folder): return
+    
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(8, 4), facecolor='#1e1e1e')
+    fig.suptitle('Hybrid Runtime: Task Scheduling', color='white')
+    
+    # CPU Cores
+    ax1.set_title("CPU Cores (Rust Workers)", color='white', fontsize=10)
+    ax1.set_facecolor('#1e1e1e')
+    ax1.axis('off')
+    
+    cores = []
+    for i in range(4):
+        rect = plt.Rectangle((0.1 + (i%2)*0.4, 0.6 - (i//2)*0.4), 0.3, 0.3, color='#34495e')
+        ax1.add_patch(rect)
+        cores.append(rect)
+        ax1.text(0.25 + (i%2)*0.4, 0.75 - (i//2)*0.4, f"Core {i}", ha='center', color='white')
+        
+    # Task Queue
+    ax2.set_title("Task Queue (Java)", color='white', fontsize=10)
+    ax2.set_facecolor('#2d2d2d')
+    ax2.set_xlim(0, 1)
+    ax2.set_ylim(0, 10)
+    ax2.axis('off')
+    
+    tasks = []
+    for i in range(10):
+        t = plt.Rectangle((0.1, i), 0.8, 0.8, color='#2ecc71')
+        ax2.add_patch(t)
+        tasks.append(t)
+
+    def update(frame):
+        # Add task
+        if frame % 10 == 0:
+            for t in tasks:
+                if t.get_y() > 8: t.set_y(0)
+                
+        # Assign to core
+        active_core = frame % 4
+        for i, c in enumerate(cores):
+            c.set_color('#e74c3c' if i == active_core else '#34495e')
+            
+        return cores + tasks
+
+    ani = animation.FuncAnimation(fig, update, frames=60, blit=False)
+    save_anim(ani, os.path.join(folder, 'demo.gif'))
+    plt.close()
+
+# --- 7. Toolchain Demo ---
+def create_toolchain_demo():
+    folder = PROJECTS["tools"]
+    if not os.path.exists(folder): return
+    
+    fig, ax = plt.subplots(figsize=(8, 4), facecolor='#1e1e1e')
+    fig.suptitle('Game Dev Toolchain: Asset Pipeline', color='white')
+    ax.set_facecolor('#1e1e1e')
+    ax.axis('off')
+    
+    # Steps
+    steps = ['Load (Java)', 'Compress (Rust)', 'Hash (Rust)', 'Package (Python)']
+    x_pos = [0.1, 0.35, 0.6, 0.85]
+    
+    for i, s in enumerate(steps):
+        ax.text(x_pos[i], 0.5, s, ha='center', color='white', fontsize=8, wrap=True)
+        ax.add_patch(plt.Circle((x_pos[i], 0.4), 0.02, color='white'))
+        
+    # Asset moving
+    asset = plt.Rectangle((0.08, 0.38), 0.04, 0.04, color='cyan')
+    ax.add_patch(asset)
+    
+    progress = ax.text(0.5, 0.2, "", ha='center', color='lime')
+
+    def update(frame):
+        f = frame % 100
+        x = 0.1 + (f / 100) * 0.75
+        asset.set_x(x)
+        
+        if x < 0.2: progress.set_text("Loading File...")
+        elif x < 0.45: progress.set_text("Compressing (LZ4)...")
+        elif x < 0.7: progress.set_text("Calculating SHA256...")
+        else: progress.set_text("Packaging Build...")
+        
+        return [asset, progress]
+
+    ani = animation.FuncAnimation(fig, update, frames=100, blit=False)
+    save_anim(ani, os.path.join(folder, 'demo.gif'))
+    plt.close()
+
 # --- Run All ---
 if __name__ == "__main__":
     print("Generating demos...")
@@ -237,5 +377,7 @@ if __name__ == "__main__":
     create_ia_demo()
     create_os_demo()
     create_sim_demo()
-    # Others can be added or just use a generic one if folder exists
+    create_plugin_demo()
+    create_runtime_demo()
+    create_toolchain_demo()
     print("Done!")
