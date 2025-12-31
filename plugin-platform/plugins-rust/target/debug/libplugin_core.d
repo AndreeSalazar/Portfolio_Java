@@ -1,0 +1,1 @@
+C:\Users\andre\OneDrive\Documentos\JAVA\ Aprendizajes\Portfolio\ Java\plugin-platform\plugins-rust\target\debug\libplugin_core.rlib: C:\Users\andre\OneDrive\Documentos\JAVA\ Aprendizajes\Portfolio\ Java\plugin-platform\plugins-rust\src\core.rs C:\Users\andre\OneDrive\Documentos\JAVA\ Aprendizajes\Portfolio\ Java\plugin-platform\plugins-rust\src\lib.rs

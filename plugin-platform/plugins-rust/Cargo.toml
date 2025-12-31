@@ -1,0 +1,18 @@
+[package]
+name = "plugin_core"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "plugin_core"
+crate-type = ["cdylib", "rlib"]
+
+[[bin]]
+name = "rust-plugin-ipc"
+path = "src/bin/rust_plugin_ipc.rs"
+
+[dependencies]
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+jni = "0.21"
+
