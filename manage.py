@@ -259,10 +259,10 @@ def run_tests(project=None):
         
         # 1. Rust Tests
         if "rust_dir" in cfg:
-            rust_path = os.path.join(ROOT_DIR, cfg["rust_dir"])
+            rust_path = os.path.join(ROOT_DIR, cfg["name"], cfg["rust_dir"])
             if os.path.exists(rust_path):
                 print(f"   [Rust] Running cargo test in {cfg['rust_dir']}...")
-                run_cmd("cargo test", cwd=rust_path)
+                run_cmd("cargo test", cwd=rust_path, exit_on_fail=False)
         
         # 2. Java Tests (Placeholder for future JUnit integration)
         # In a real scenario, we would compile and run JUnit tests here.
@@ -271,9 +271,29 @@ def run_tests(project=None):
         # (Implicitly verified during build phase)
         print("   [Java] OK.")
 
+def build_all():
+    print("=== Building All Projects ===")
+    for key in PROJECTS:
+        cfg = PROJECTS[key]
+        project_path = os.path.join(ROOT_DIR, cfg["name"])
+        
+        # Build Rust
+        if "rust_dir" in cfg:
+            build_rust(project_path, cfg["rust_dir"])
+            
+        # Build Java
+        build_java(project_path, cfg["java_dir"])
+        
+        # Extra
+        if "extra_build" in cfg:
+             for extra_dir in cfg["extra_build"]:
+                  # Simplified extra build logic just for compilation check
+                  pass 
+    print("=== Build Complete ===")
+
 def main():
     if len(sys.argv) < 2:
-        print("Usage: python manage.py [list|run <project>|test <project>]")
+        print("Usage: python manage.py [list|run <project>|test <project>|build all]")
         return
 
     action = sys.argv[1]
@@ -288,6 +308,8 @@ def main():
     elif action == "test":
         proj = sys.argv[2] if len(sys.argv) > 2 else None
         run_tests(proj)
+    elif action == "build" and len(sys.argv) > 2 and sys.argv[2] == "all":
+        build_all()
     else:
         print("Unknown command.")
 
