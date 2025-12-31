@@ -1,15 +1,28 @@
 # Toolchain para Game Development
 
-![Demo](demo.gif)
+> **"La potencia de CLI con la usabilidad de GUI."**
 
-Una suite de herramientas de escritorio para procesar assets de videojuegos (texturas, modelos, sonidos).
+![Toolchain Demo](demo.gif)
 
-## Arquitectura
-- **Java (Swing)**: Provee una UI amigable y portable.
-- **Rust**: Realiza operaciones costosas como compresión (LZ4/Gzip) y Hashing (SHA-256) en milisegundos.
-- **Python**: Automatiza el empaquetado final del build.
+## ❓ El Problema Real
+Las herramientas de desarrollo de videojuegos (compresores de texturas, compiladores de shaders) suelen ser scripts de línea de comandos difíciles de usar para artistas, o aplicaciones GUI lentas y pesadas.
 
-## Ejecución
-1. `cd rust-core && cargo build --release`
-2. `cd java-tools && javac -d out src/main/java/toolchain/*.java`
-3. `java -cp out toolchain.Main`
+## 🛠 La Solución Arquitectónica
+Lo mejor de ambos mundos:
+
+1.  **Java (Frontend)**: Interfaz gráfica (Swing) rica y responsiva. Fácil de mantener y modificar.
+2.  **Rust (Backend)**: El "músculo". Ejecuta algoritmos de compresión y procesamiento de imágenes en segundo plano.
+3.  **Python (Build System)**: Scripts que empaquetan los assets finales.
+
+### Concepto Clave: Off-Main-Thread Execution
+La UI de Java nunca se congela ("Application Not Responding") porque delega todo el trabajo pesado a procesos Rust en segundo plano, comunicándose por IPC o JNI.
+
+## ⚙️ Cómo Ejecutar
+Abre la herramienta de escritorio:
+
+```bash
+python ../manage.py run tools
+```
+
+## 📈 Escalabilidad
+Esta arquitectura es modular. Puedes actualizar el algoritmo de compresión en Rust sin tocar una sola línea de código de la interfaz gráfica en Java.

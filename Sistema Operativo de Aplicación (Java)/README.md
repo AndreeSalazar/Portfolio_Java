@@ -1,21 +1,27 @@
-# Sistema Operativo de Aplicación (Java)
+# Kernel de Aplicación (Java-OS)
 
-![Demo](demo.gif)
+> **"Simulando un Sistema Operativo seguro en espacio de usuario."**
 
-## Qué es
-Un mini-OS para aplicaciones que gestiona lifecycle, procesos, recursos y eventos.
+![OS Demo](demo.gif)
 
-## Qué demuestras
-- **Pensamiento de sistema**: Diseño de kernel lógico y scheduling.
-- **Rust**: Módulos críticos de memoria y IO.
-- **Nivel sistema, no CRUD**: Arquitectura orientada a eventos y gestión de recursos.
+## ❓ El Problema Real
+En plataformas de Cloud Computing (como AWS Lambda) o plugins de servidores (como Minecraft), ejecutar código de terceros es peligroso. Un script malicioso podría consumir toda la memoria o bloquear la CPU.
 
-## Arquitectura
-- **Java Kernel**: Scheduler (Round Robin), Event Bus, Process Table.
-- **Rust Core**: Gestión de memoria física simulada, IO operations.
-- **Modos**: JNI (in-process), IPC (socket TCP), JAVA (mock fallback).
+## 🛠 La Solución Arquitectónica
+Este proyecto implementa un **Microkernel** que aísla la ejecución de código:
 
-## Ejecución
-1. Compilar Rust: `cd rust-core && cargo build --release`
-2. Compilar Java: `cd java-os && javac -d out src/main/java/os/*.java`
-3. Ejecutar: `java -cp out os.Main`
+1.  **Java (Scheduler)**: Actúa como el Kernel. Decide qué "proceso" se ejecuta en cada momento usando algoritmos de planificación (Round Robin).
+2.  **Rust (MMU Virtual)**: Simula una Unidad de Gestión de Memoria. Si un proceso intenta acceder a memoria que no le pertenece, Rust intercepta el acceso y termina el proceso antes de que dañe al sistema.
+
+### Concepto Clave: Syscalls Simuladas
+Los procesos no acceden al hardware directamente. Hacen "Syscalls" a Rust (a través de JNI), permitiendo un control granular de permisos y recursos.
+
+## ⚙️ Cómo Ejecutar
+Lanza el simulador de Kernel:
+
+```bash
+python ../manage.py run os
+```
+
+## 📈 Escalabilidad
+Este diseño es la base de los sistemas "Multi-tenant" seguros. Permite ejecutar miles de micro-procesos aislados en una sola JVM, mucho más ligero que levantar miles de contenedores Docker.

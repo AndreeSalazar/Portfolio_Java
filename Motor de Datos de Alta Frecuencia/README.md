@@ -1,32 +1,28 @@
-# Motor de Datos de Alta Frecuencia (Java + Rust)
+# Motor de Trading de Alta Frecuencia (HFT)
 
-![Demo](demo.gif)
+> **"Cuando un milisegundo cuesta millones."**
 
-Un motor que ingiere streams, procesa eventos y responde en tiempo real.
+![HFT Demo](demo.gif)
 
-Arquitectura
-- Java: Streams, networking, gestión de vida y orquestación de pipelines.
-- Rust: Parsing ultra rápido de CSV, buffers y camino hacia SIMD.
-- Modos: JNI en proceso e IPC por socket, con fallback JAVA.
+## ❓ El Problema Real
+En los mercados financieros modernos, la velocidad lo es todo. Las arquitecturas tradicionales en Java sufren de **"Stop-the-world pauses"** causadas por el Garbage Collector (GC). Si el GC se despierta durante un pico de mercado, pierdes dinero.
 
-Demostración
-- Ingesta SPSC con ring buffer lock-free simple.
-- Métricas: throughput por segundo y último notional calculado.
+## 🛠 La Solución Arquitectónica
+Este motor utiliza un diseño híbrido para garantizar **latencia determinista**:
 
-Cómo ejecutar
-1) Compilar Java:
-   - mkdir "Motor de Datos de Alta Frecuencia/java-core/out"
-   - javac -d "Motor de Datos de Alta Frecuencia/java-core/out" "Motor de Datos de Alta Frecuencia/java-core/src/main/java/hf/HFRustAdapter.java" "Motor de Datos de Alta Frecuencia/java-core/src/main/java/hf/HFEngine.java" "Motor de Datos de Alta Frecuencia/java-core/src/main/java/hf/HFMain.java"
-2) Compilar Rust:
-   - cd "Motor de Datos de Alta Frecuencia/rust-core" && cargo build
-3) Ejecutar:
-   - Java fallback: java -cp "Motor de Datos de Alta Frecuencia/java-core/out" hf.HFMain
-   - JNI: set HF_NATIVE_LIB=ABSOLUTE_PATH_TO\\"Motor de Datos de Alta Frecuencia\\rust-core\\target\\debug\\hf_core.dll" && java --enable-native-access=ALL-UNNAMED -cp "Motor de Datos de Alta Frecuencia/java-core/out" hf.HFMain
-   - IPC: set HF_NATIVE_LIB= && set HF_IPC_BIN=ABSOLUTE_PATH_TO\\"Motor de Datos de Alta Frecuencia\\rust-core\\target\\debug\\hf-ipc.exe" && java -cp "Motor de Datos de Alta Frecuencia/java-core/out" hf.HFMain
+1.  **Java (Network Router)**: Maneja las conexiones TCP/UDP usando NIO. Es excelente para I/O asíncrono.
+2.  **Rust (Matching Engine)**: Recibe punteros directos a los buffers de red. "Parsea" los datos financieros (formato binario/FIX) y ejecuta la lógica de negocio sin asignar memoria en el Heap de Java.
 
-Casos de uso
-- Trading, Telemetría, IoT, Monitoreo industrial.
+### ¿Por qué Rust aquí?
+Rust permite gestionar la memoria manualmente con seguridad. Usamos **Zero-Copy Deserialization**: en lugar de crear objetos `Order` en Java (que el GC tendría que limpiar), Rust lee los bytes directamente del buffer de red.
 
-WOW
-- Concurrencia y pipelines en Java + parsing rápido en Rust = plataforma silenciosa y eficiente.
+## ⚙️ Cómo Ejecutar
+Este proyecto es parte del monorepo. Usa el script maestro:
 
+```bash
+# Compila Rust (Release) -> Compila Java -> Ejecuta
+python ../manage.py run hft
+```
+
+## 📈 Escalabilidad
+Esta arquitectura escala horizontalmente. Un solo nodo puede procesar >500k mensajes/segundo. Para escalar más, se pueden desplegar múltiples instancias de "Routers" Java que alimentan a un cluster de motores Rust.

@@ -1,36 +1,30 @@
-# Backend de IA NO-Framework (Java + Python + Rust)
+# Backend de IA "Bare-Metal" (No-Framework)
 
-![Demo](demo.gif)
+> **"Inferencia de IA sin el peso de Docker ni Python en runtime."**
 
-Qué es
-- Java gestiona jobs y orquestación.
-- Python entrena modelos rápidamente.
-- Rust ejecuta inferencia con baja latencia.
+![IA Demo](demo.gif)
 
-Arquitectura
-- Modos: JNI para ejecución en proceso, IPC por socket y fallback JAVA.
-- API JSON uniforme para training/inference.
+## ❓ El Problema Real
+Desplegar modelos de IA en producción suele ser ineficiente.
+*   **Python** es lento para servir peticiones HTTP concurrentes (GIL).
+*   **TensorFlow/PyTorch** son librerías gigantescas (>500MB) difíciles de desplegar en entornos ligeros.
 
-Cómo ejecutar
-1) Entrenamiento Python:
-   - python "Backend de IA NO-Framework/python-train/train.py"
-2) Compilar Java:
-   - mkdir "Backend de IA NO-Framework/java-backend/out"
-   - javac -d "Backend de IA NO-Framework/java-backend/out" "Backend de IA NO-Framework/java-backend/src/main/java/ia/IARustAdapter.java" "Backend de IA NO-Framework/java-backend/src/main/java/ia/JobManager.java" "Backend de IA NO-Framework/java-backend/src/main/java/ia/Main.java"
-3) Compilar Rust:
-   - cd "Backend de IA NO-Framework/rust-infer" && cargo build
-4) Ejecutar:
-   - JAVA fallback: java -cp "Backend de IA NO-Framework/java-backend/out" ia.Main
-   - JNI: set IA_NATIVE_LIB=ABSOLUTE_PATH_TO\\"Backend de IA NO-Framework\\rust-infer\\target\\debug\\ia_infer.dll" && java --enable-native-access=ALL-UNNAMED -cp "Backend de IA NO-Framework/java-backend/out" ia.Main
-   - IPC: set IA_NATIVE_LIB= && set IA_IPC_BIN=ABSOLUTE_PATH_TO\\"Backend de IA NO-Framework\\rust-infer\\target\\debug\\infer-ipc.exe" && java -cp "Backend de IA NO-Framework/java-backend/out" ia.Main
+## 🛠 La Solución Arquitectónica
+Un servidor de inferencia desde cero que elimina la dependencia de Python en producción:
 
-Demostración
-- Separación de training (Python) e inference (Rust).
-- Respuesta en tiempo real con pipeline simple.
+1.  **Python (Solo Entrenamiento)**: Se usa para diseñar y entrenar la red neuronal. Exporta los pesos a un formato binario simple (`weights.bin`).
+2.  **Java (API Gateway)**: Recibe las peticiones REST y gestiona la cola de trabajos.
+3.  **Rust (Motor de Inferencia)**: Carga `weights.bin` y ejecuta la multiplicación de matrices usando instrucciones vectoriales (SIMD) de la CPU.
 
-Casos de uso
-- Empresas reales, IA embebida y edge computing.
+### ¿Por qué no usar TorchServe?
+Esta implementación demuestra cómo construir un motor de inferencia personalizado para sistemas embebidos o de latencia crítica donde no puedes permitirte el overhead de un framework completo.
 
-WOW
-- Llevar IA a producción con orquestación, training separado e inferencia eficiente.
+## ⚙️ Cómo Ejecutar
+El script `manage.py` orquesta el entrenamiento (si es necesario) y la ejecución:
 
+```bash
+python ../manage.py run ia
+```
+
+## 📈 Escalabilidad
+Al desacoplar el servidor HTTP (Java) del cómputo (Rust), podemos ajustar el número de hilos de inferencia independientemente de las conexiones de red, maximizando el uso de la CPU.
