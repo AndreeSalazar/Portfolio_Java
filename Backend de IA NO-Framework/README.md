@@ -19,19 +19,45 @@ Un servidor de inferencia desde cero que elimina la dependencia de Python en pro
 ### ¿Por qué no usar TorchServe?
 Esta implementación demuestra cómo construir un motor de inferencia personalizado para sistemas embebidos o de latencia crítica donde no puedes permitirte el overhead de un framework completo.
 
-## 📐 Diagrama de Arquitectura
+## 📐 Diagrama de Arquitectura Detallado
+
+### Diagrama de Flujo de Datos (Data Flow)
 
 ```mermaid
-graph LR
-    A[Usuario API REST] -->|HTTP POST| B(Java Job Manager)
-    subgraph "Training Phase"
-        T[Python Scripts] -->|Export Weights| F[weights.bin]
+graph TD
+    User((Usuario)) -->|JSON Request| API[Java API Gateway]
+    
+    subgraph "Inference Pipeline"
+        API -->|Parse| Task[Job Queue]
+        Task -->|Pop| Worker[Rust Worker Thread]
+        
+        subgraph "SIMD Engine"
+            Worker -->|Load| Weights[Model Weights (RAM)]
+            Worker -->|Compute| AVX[AVX2 Instructions]
+        end
+        
+        AVX -->|Result| Worker
     end
-    F -->|Load Memory| C
-    B -->|JNI Call| C[Rust Inference Engine]
-    C -->|SIMD AVX2| C
-    C -->|Prediction| B
-    B -->|JSON Response| A
+    
+    Worker -->|Callback| API
+    API -->|Response| User
+```
+
+### Diagrama de Despliegue
+
+```mermaid
+graph TD
+    subgraph "Production Server"
+        JVM[Java Virtual Machine]
+        JVM -->|Load Library| DLL[rust_infer.dll / .so]
+        
+        subgraph "Memory Space"
+            Heap[Java Heap]
+            OffHeap[Off-Heap Memory (Model Weights)]
+        end
+        
+        DLL -->|Read| OffHeap
+    end
 ```
 
 ## 📊 Benchmarks de Rendimiento

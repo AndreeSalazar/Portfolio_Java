@@ -16,18 +16,47 @@ Este motor utiliza un diseño híbrido para garantizar **latencia determinista**
 ### ¿Por qué Rust aquí?
 Rust permite gestionar la memoria manualmente con seguridad. Usamos **Zero-Copy Deserialization**: en lugar de crear objetos `Order` en Java (que el GC tendría que limpiar), Rust lee los bytes directamente del buffer de red.
 
-## 📐 Diagrama de Arquitectura
+## 📐 Diagrama de Arquitectura Detallado
+
+### Diagrama de Secuencia: Flujo de una Orden
+Este diagrama detalla cómo un mensaje FIX viaja desde la red hasta el motor de matching sin generar basura (Zero-GC).
 
 ```mermaid
-graph TD
-    A[Client TCP Stream] -->|Bytes| B(Java NIO Router)
-    B -->|JNI DirectByteBuffer| C[Rust Matching Engine]
-    subgraph "Zero-GC Zone"
-        C -->|Unsafe Pointer| D{Order Book}
-        D -->|Match Result| E[Serialization Buffer]
-    end
-    E -->|JSON/Binary| B
-    B -->|Network Response| A
+sequenceDiagram
+    participant Net as Network (Netty)
+    participant JNI as JNI Bridge
+    participant Rust as Rust Engine
+    participant OB as OrderBook
+    
+    Net->>JNI: DirectByteBuffer (off-heap)
+    Note right of Net: Zero Copy
+    JNI->>Rust: process_order(ptr, len)
+    Rust->>Rust: Unsafe cast to struct
+    Rust->>OB: match_order()
+    OB-->>Rust: ExecutionReport
+    Rust-->>JNI: write_response(ptr)
+    JNI-->>Net: Send TCP ACK
+```
+
+### Diagrama de Clases (Simplificado)
+
+```mermaid
+classDiagram
+    class HFEngine {
+        +start()
+        +stop()
+    }
+    class HFRustAdapter {
+        +init(config)
+        +onPacket(buffer)
+    }
+    class MatchingEngine {
+        -orders: HashMap
+        +match()
+    }
+    
+    HFEngine --> HFRustAdapter : JNI Calls
+    HFRustAdapter ..> MatchingEngine : FFI (Rust)
 ```
 
 ## 📊 Benchmarks de Rendimiento

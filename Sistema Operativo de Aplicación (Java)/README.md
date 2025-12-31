@@ -16,23 +16,46 @@ Este proyecto implementa un **Microkernel** que aísla la ejecución de código:
 ### Concepto Clave: Syscalls Simuladas
 Los procesos no acceden al hardware directamente. Hacen "Syscalls" a Rust (a través de JNI), permitiendo un control granular de permisos y recursos.
 
-## 📐 Diagrama de Arquitectura
+## 📐 Diagrama de Arquitectura Detallado
+
+### Diagrama de Estados del Proceso (Process Lifecycle)
 
 ```mermaid
-sequenceDiagram
-    participant Process as User Process (Java)
-    participant Kernel as Kernel Scheduler (Java)
-    participant MMU as MMU / HAL (Rust)
+stateDiagram-v2
+    [*] --> Created
+    Created --> Ready : Scheduler.submit()
     
-    Process->>Kernel: Request Memory (malloc)
-    Kernel->>MMU: JNI: allocate_page(pid)
-    MMU-->>Kernel: Returns Virtual Address
-    Kernel-->>Process: Pointer
+    state "Running (Rust VM)" as VM {
+        Ready --> Executing : Context Switch
+        Executing --> Blocked : Syscall (I/O)
+        Blocked --> Ready : I/O Complete
+        Executing --> Ready : Time Slice Expired
+    }
     
-    Process->>Kernel: Write Data
-    Kernel->>MMU: JNI: write_memory(addr, data)
-    Note right of MMU: Checks Permissions (Segmentation Fault?)
-    MMU-->>Kernel: Success / Panic
+    Executing --> Terminated : Exit / Panic
+    Terminated --> [*]
+```
+
+### Diagrama de Componentes
+
+```mermaid
+classDiagram
+    class Kernel {
+        +scheduler
+        +syscall_handler
+    }
+    class ProcessControlBlock {
+        +pid
+        +state
+        +memory_ptr
+    }
+    class RustMMU {
+        +translate_addr()
+        +check_perms()
+    }
+    
+    Kernel *-- ProcessControlBlock : Manages
+    Kernel --> RustMMU : Enforces Isolation
 ```
 
 ## 📊 Métricas de Seguridad y Rendimiento

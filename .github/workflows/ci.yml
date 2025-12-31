@@ -36,5 +36,22 @@ jobs:
     - name: Build All Projects
       run: python manage.py build all
 
-    - name: Run Tests
-      run: python manage.py test
+    - name: Run Tests with Coverage
+      run: |
+        python manage.py test
+        # In a real scenario, we would merge coverage reports here
+
+    - name: Upload Build Artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: native-binaries
+        path: |
+          **/target/release/*.dll
+          **/target/release/*.so
+          **/out/**/*.class
+
+    - name: Upload Benchmark Results
+      uses: actions/upload-artifact@v3
+      with:
+        name: benchmarks
+        path: docs/images/benchmark-*.png
