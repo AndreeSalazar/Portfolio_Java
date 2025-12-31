@@ -1,5 +1,7 @@
 # Backend de IA NO-Framework (Java + Python + Rust)
 
+![Demo](demo.gif)
+
 Qué es
 - Java gestiona jobs y orquestación.
 - Python entrena modelos rápidamente.

@@ -1,40 +1,70 @@
 # Portfolio de Plataformas (Java + Rust + Python)
 
-Propósito
-- Demostrar arquitectura de sistemas y plataformas, no apps.
-- Diseños con IPC, FFI/JNI bien hechos y runtimes/modos alternos.
+Este repositorio demuestra arquitectura de sistemas avanzada, combinando la robustez enterprise de **Java**, el rendimiento de sistema de **Rust** y la flexibilidad de **Python**.
 
-Módulos
-- Runtime de Ejecución Híbrido (Java Control + Rust Core): orquestación Java, núcleo Rust, modos JNI/IPC/JAVA.
-- Framework de Simulación en Tiempo Real (Java + Rust): escenarios, métricas y física/colisiones nativas.
-- Toolchain Profesional para Game Dev (Java): editor de assets, profiler y pipelines con núcleo Rust y scripts Python.
-- Plataforma de Plugins Multilenguaje (Java Core): plugins Java, módulos nativos Rust y extensiones Python.
-- Motor de Datos de Alta Frecuencia (Java + Rust): ingesta, eventos y respuesta en tiempo real.
+## 🚀 Proyectos Destacados
 
-Razones
-- Arquitectura de sistemas: separación de control/ejecución, APIs JSON uniformes.
-- IPC, FFI, JNI: canales duales y ABI estable.
-- Diseño de runtimes: patrones JVM-lite y selección de modos.
-- Concurrencia y lock-free: ring buffers y SPSC donde aplica.
-- Observabilidad y UX técnico: métricas y herramientas de apoyo.
-- Seguridad y estabilidad: sandboxing por IPC y control de carga nativa.
+### 1. Motor de Datos de Alta Frecuencia (HFT)
+**Concepto**: Ingesta de streams, procesamiento de eventos y respuesta en tiempo real.
+- **Tech**: Java (Streams/Net) + Rust (Parsing/Buffers).
+- **Key**: Concurrencia lock-free, latencia mínima.
 
-Lenguajes
-- Java: threads maduros, GC estable, ecosistema enterprise, hot-reload, UI técnica, ClassLoaders.
-- Rust: ejecución determinista, seguridad de memoria, performance crítica, parsing y buffers.
-- Python: scripting, testing, automatización y prototipos rápidos.
+![HFT Demo](Motor%20de%20Datos%20de%20Alta%20Frecuencia/demo.gif)
 
-Cómo ejecutar
-- Cada módulo incluye instrucción de build y ejecución en su carpeta.
-- Modos nativos: establecer variables de entorno para DLL/EXE y usar --enable-native-access según corresponda.
+---
 
-GitHub
-- Incluye .gitignore y estructura ordenada para publicación.
-- Sugerencia de publicación:
-  - git init
-  - git add .
-  - git commit -m "Portfolio de Plataformas: Java + Rust + Python"
-  - git branch -M main
-  - git remote add origin https://github.com/<usuario>/<repo>.git
-  - git push -u origin main
+### 2. Backend de IA NO-Framework
+**Concepto**: Infraestructura de IA agnóstica de frameworks pesados para producción.
+- **Tech**: Java (Job Manager) + Python (Training) + Rust (Inference).
+- **Key**: Separación de training/inference, JNI/IPC fallback.
 
+![IA Demo](Backend%20de%20IA%20NO-Framework/demo.gif)
+
+---
+
+### 3. Sistema Operativo de Aplicación (Java-OS)
+**Concepto**: Un mini-kernel para gestionar ciclo de vida de aplicaciones y recursos.
+- **Tech**: Java (Kernel/Scheduler) + Rust (Memory/IO).
+- **Key**: Diseño de sistemas, gestión de procesos, no-CRUD.
+
+![OS Demo](Sistema%20Operativo%20de%20Aplicación%20(Java)/demo.gif)
+
+---
+
+### 4. Framework de Simulación (Sim-Framework)
+**Concepto**: Motor físico y de simulación de entornos.
+- **Tech**: Java (Control) + Rust (Physics Core).
+
+![Sim Demo](sim-framework/demo.gif)
+
+---
+
+## 🛠 Arquitectura General
+Todos los proyectos siguen principios de diseño modular:
+- **Java**: Orquestador, lógica de negocio de alto nivel, thread management.
+- **Rust**: Hot-paths, gestión de memoria, parsing, operaciones costosas.
+- **Python**: Scripting, glue-code, training, tooling.
+
+### Patrones Implementados
+- **JNI & IPC**: Capacidad de ejecutar código nativo en el mismo proceso (JNI) o separado (IPC/TCP) para robustez.
+- **Uniform JSON API**: Comunicación estandarizada entre lenguajes.
+- **Fallback Mechanisms**: Si el módulo nativo falla, el sistema degrada suavemente a implementaciones Java.
+
+## 📦 Estructura del Repositorio
+- `Motor de Datos de Alta Frecuencia/`: Engine HFT.
+- `Backend de IA NO-Framework/`: Infraestructura ML.
+- `Sistema Operativo de Aplicación (Java)/`: Mini-OS Kernel.
+- `plugin-platform/`: Sistema de plugins multilenguaje.
+- `runtime/`: Runtime de ejecución híbrido.
+- `sim-framework/`: Motor de física/simulación.
+- `toolchain-gamedev/`: Herramientas de desarrollo.
+
+## 🔧 Cómo Ejecutar
+Cada carpeta contiene su propio `README.md` con instrucciones detalladas de compilación y ejecución.
+Generalmente:
+1. `cargo build --release` en carpetas `rust-core`.
+2. `javac` en carpetas `java-*`.
+3. Ejecutar el `Main` de Java.
+
+---
+*Generado con ❤️ y código.*

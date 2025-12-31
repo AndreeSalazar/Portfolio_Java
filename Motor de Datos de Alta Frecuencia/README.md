@@ -1,5 +1,7 @@
 # Motor de Datos de Alta Frecuencia (Java + Rust)
 
+![Demo](demo.gif)
+
 Un motor que ingiere streams, procesa eventos y responde en tiempo real.
 
 Arquitectura
